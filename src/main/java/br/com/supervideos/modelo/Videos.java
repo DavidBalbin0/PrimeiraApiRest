@@ -1,9 +1,10 @@
 package br.com.supervideos.modelo;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import org.hibernate.validator.constraints.Length;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class Videos {
@@ -13,8 +14,10 @@ public class Videos {
     private String titulo;
     private String descricao;
     private String url;
+    @ManyToOne
+    Categorias categoria;
 
-    public Videos() {
+    public Videos(@NotNull @NotEmpty @Length(min = 5, max = 15) String titulo, @NotNull @NotEmpty @Length(min = 5, max = 15) String cor) {
     }
 
     public Videos(String titulo, String descricao, String url){
