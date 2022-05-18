@@ -15,6 +15,7 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -38,9 +39,15 @@ public class VideosController {
 
 
     @GetMapping(value = "/{id}")
-    public List<VideoDto> pesquisaPorUri(@PathVariable("id") Long id){
-        List<Videos> videos =  videoRepository.findAllById(Collections.singleton(id));
-        return VideoDto.convert(videos);
+    public ResponseEntity<VideoDto> detalhar(@PathVariable Long id){
+
+        Optional<Videos> videos = videoRepository.findById(id);
+        if(videos.isPresent()){
+            return ResponseEntity.ok(new VideoDto(videos.get()));
+        }else{
+            return ResponseEntity.notFound().build();
+        }
+
     }
 
     @PostMapping
@@ -56,17 +63,24 @@ public class VideosController {
     @PutMapping("/{id}")
     @Transactional
     public ResponseEntity<VideoDto> atualizar(@PathVariable Long id, @RequestBody @Valid AtualizacaoVideosForm form){
-       Videos videos = form.atualiza(id, videoRepository);
-
-       return ResponseEntity.ok(new VideoDto(videos));
+        Optional<Videos> optionalVideos = videoRepository.findById(id);
+        if(optionalVideos.isPresent()){
+            Videos videos = form.atualiza(id, videoRepository);
+            return ResponseEntity.ok(new VideoDto(videos));
+        }else{
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")
     public  ResponseEntity<VideoDto> remove(@PathVariable Long id){
-
-       videoRepository.deleteById(id);
-       return ResponseEntity.ok().build();
-
+        Optional<Videos> optionalVideos = videoRepository.findById(id);
+        if(optionalVideos.isPresent()){
+            videoRepository.deleteById(id);
+            return ResponseEntity.ok().build();
+        }else{
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }
